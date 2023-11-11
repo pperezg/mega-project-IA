@@ -21,7 +21,8 @@ def train_svms(
         The training data.
     y : np.ndarray
         The training labels.
-    kernel : str
+    kernel : Callable | np.ndarray | None
+        The kernel function or matrix. None by default.
     random_state : int
         The random state.
 
