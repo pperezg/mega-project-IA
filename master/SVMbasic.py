@@ -1,7 +1,6 @@
 """A module to train SVMs and evaluate their kernels."""
-
+from __future__ import annotations
 from typing import Callable
-
 import numpy as np
 from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
@@ -12,7 +11,7 @@ def train_svms(
     y: np.ndarray,
     heat_kernel: Callable | np.ndarray | None = None,
     random_state: int = 0,
-) -> SVC:
+    ) -> SVC:
     """Train an SVM with the given parameters.
 
     Parameters
@@ -77,7 +76,7 @@ def train_svms(
 
 def evaluate_kernels(
     svms: dict[str, SVC | None], X_test: np.ndarray, y_test: np.ndarray
-):
+    ):
     """
     Evaluate the kernels of the given SVMs. The evaluation is done by
     computing the accuracy score of each SVM on the test set.

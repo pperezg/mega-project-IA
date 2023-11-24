@@ -1,7 +1,6 @@
 """A module to train SVMs and evaluate their kernels."""
-
+from __future__ import annotations
 from typing import Callable
-
 import numpy as np
 from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC

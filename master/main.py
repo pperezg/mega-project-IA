@@ -1,48 +1,55 @@
 from dataReading import *
 from generator import *
-from SVM_basic import *
-from SVM_fisher import *
-
+from SVMfisher import *
+from SVMbasic import *
 import numpy as np
 import os
 import sys
+import itertools
 
-###################################### Main de Paty
 if __name__ == "__main__":
+    ##################################################### Work by Patiño's team
     # Set up directory paths
     current_directory = os.getcwd()
-    data_directory = os.path.join(current_directory, "data")
+    data_directory = os.path.join(current_directory, "GeneratedData")
     verify_directory(data_directory)
     points_directory = os.path.join(data_directory, "points")
     verify_directory(points_directory)
     mu_sigma_directory = os.path.join(data_directory, "mu_sigma")
     verify_directory(mu_sigma_directory)
 
+    mu = [0,5,10,15,20,25,30,35,40,45,50]
+    sigma = [1,2,3,4,5,6,7,8,9,10]
+    q = [1,1.5,2,2.5]
+    parameters = {"num_points": 100,"dimension": 50}
+    combinations = list(itertools.product(mu, sigma, q))
+
     # Get parameter keys
     parameter_keys = list(parameters.keys())
 
     # Generate data and save to files for each set of parameters
-    for parameter_key in parameter_keys[2:]:
+    for combination in combinations:
         matrix = generate_random_points(
             parameters[parameter_keys[0]],
             parameters[parameter_keys[1]],
-            parameters[parameter_key]["mu"],
-            parameters[parameter_key]["sigma"],
-            parameters[parameter_key]["q"]
+            combination[0],
+            combination[1],
+            combination[2]
         )
         np.savetxt(
             os.path.join(points_directory,
-                         f'mu{parameters[parameter_key]["mu"]}_sigma{parameters[parameter_key]["sigma"]}_q{parameters[parameter_key]["q"]}.csv'),
+                         f'mu{combination[0]}_sigma{combination[1]}_q{combination[2]}.csv'),
             matrix,
             delimiter=",")
 
         df = calculate_mu_sigma(matrix)
         df.to_csv(
             os.path.join(mu_sigma_directory,
-                         f'mu{parameters[parameter_key]["mu"]}_sigma{parameters[parameter_key]["sigma"]}_q{parameters[parameter_key]["q"]}.csv'),
+                         f'mu{combination[0]}_sigma{combination[1]}_q{combination[2]}.csv'),
             index=False)
 
-    # Plot the points and save them to a png file
+    print('Terminó trabajo de Patiño')
+    ##################################################### Work by Agustin's team
     create_data_space((30, 6, 1), (20, 5, 1))
 
 ################## Main de Juli y Bombi
