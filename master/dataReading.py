@@ -28,17 +28,18 @@ def create_data_space(first_source, scnd_source):
     # Assert that the triples are different
     assert first_source != scnd_source
     # Assert that the first triple corresponds to an existing file
-    first_source_file_name = ('data/mu' + str(first_source[0]) + '_sigma' + str(first_source[1]) + '_q' +
-                              "{:.1f}".format(first_source[2]) + '.csv')
+    first_source_file_name = ('GeneratedData/mu_sigma/mu' + str(first_source[0]) + '_sigma' + str(first_source[1]) + '_q' +
+                              str(first_source[2]) + '.csv')
     assert os.path.isfile(first_source_file_name)
     # Assert that the second triple corresponds to an existing file
-    scnd_source_file_name = ('data/mu' + str(scnd_source[0]) + '_sigma' + str(scnd_source[1]) + '_q' +
-                             "{:.1f}".format(scnd_source[2]) + '.csv')
+    scnd_source_file_name = ('GeneratedData/mu_sigma/mu' + str(scnd_source[0]) + '_sigma' + str(scnd_source[1]) + '_q' +
+                             str(scnd_source[2]) + '.csv')
     assert os.path.isfile(scnd_source_file_name)
 
+
     # Create a folder named 'data_space' in the current directory
-    if not os.path.exists('data_space'):
-        os.makedirs('data_space')
+    if not os.path.exists('GeneratedData/data_space'):
+        os.makedirs('GeneratedData/data_space')
     # Read the data from the first source file
     first_source_data_frame = pd.read_csv(first_source_file_name)
     # Append a column containing the label of the source to the data frame
@@ -50,9 +51,9 @@ def create_data_space(first_source, scnd_source):
     # Create the data_space data frame by concatenating the two data frames
     data_space = pd.concat([first_source_data_frame, scnd_source_data_frame])
     # Save the data_space data frame to a csv file
-    data_space.to_csv('data_space/mu' + str(first_source[0]) + '_sigma' + str(first_source[1]) + '_q' +
-                      "{:.1f}".format(first_source[2]) + '_mu' + str(scnd_source[0]) + '_sigma' + str(scnd_source[1]) +
-                      '_q' + "{:.1f}".format(scnd_source[2]) + '.csv', index = False)
+    data_space.to_csv('GeneratedData/data_space/mu' + str(first_source[0]) + '_sigma' + str(first_source[1]) + '_q' +
+                      str(first_source[2]) + '_mu' + str(scnd_source[0]) + '_sigma' + str(scnd_source[1]) +
+                      '_q' + str(scnd_source[2]) + '.csv', index = False)
 
     # Plot the points of the first source
     plt.scatter(first_source_data_frame['mu'], first_source_data_frame['sigma'], c='red')
@@ -63,10 +64,10 @@ def create_data_space(first_source, scnd_source):
     plt.ylabel('sigma')
     # Add legend
     plt.legend(['μ = ' + str(first_source[0]) + ', σ = ' + str(first_source[1]) + ', q = ' +
-                "{:.1f}".format(first_source[2]),
+                str(first_source[2]),
                 'μ = ' + str(scnd_source[0]) + ', σ = ' + str(scnd_source[1]) + ', q = ' +
-                "{:.1f}".format(scnd_source[2])])
+                str(scnd_source[2])])
     # Save the plot to a png file
-    plt.savefig('data_space/mu' + str(first_source[0]) + '_sigma' + str(first_source[1]) + '_q' +
-                "{:.1f}".format(first_source[2]) + '_mu' + str(scnd_source[0]) + '_sigma' + str(scnd_source[1]) +
-                '_q' + "{:.1f}".format(scnd_source[2]) + '.png')
+    plt.savefig('GeneratedData/data_space/mu' + str(first_source[0]) + '_sigma' + str(first_source[1]) + '_q' +
+                str(first_source[2]) + '_mu' + str(scnd_source[0]) + '_sigma' + str(scnd_source[1]) +
+                '_q' + str(scnd_source[2]) + '.png')

@@ -6,6 +6,7 @@ import numpy as np
 import os
 import sys
 import itertools
+from tqdm import tqdm
 
 if __name__ == "__main__":
     ##################################################### Work by Patiño's team
@@ -18,9 +19,9 @@ if __name__ == "__main__":
     mu_sigma_directory = os.path.join(data_directory, "mu_sigma")
     verify_directory(mu_sigma_directory)
 
-    mu = [0,5,10,15,20,25,30,35,40,45,50]
-    sigma = [1,2,3,4,5,6,7,8,9,10]
-    q = [1,1.5,2,2.5]
+    mu = [0,5,10]
+    sigma = [1,3,5]
+    q = [1,1.5,2]
     parameters = {"num_points": 100,"dimension": 50}
     combinations = list(itertools.product(mu, sigma, q))
 
@@ -49,10 +50,17 @@ if __name__ == "__main__":
             index=False)
 
     print('Terminó trabajo de Patiño')
-    ##################################################### Work by Agustin's team
-    create_data_space((30, 6, 1), (20, 5, 1))
 
-################## Main de Juli y Bombi
+    ##################################################### Work by Agustin's team
+    
+    for i in tqdm(range(len(combinations))):
+        for j in range(len(combinations)):
+            if i != j:
+                create_data_space(combinations[i], combinations[j])
+
+    print('Terminó trabajo de Agustin')
+
+    ##################################################### Work by Pedro's team
 '''
 
 def main():
