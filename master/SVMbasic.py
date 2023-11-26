@@ -12,6 +12,7 @@ def train_svms(
     heat_kernel: Callable | np.ndarray | None = None,
     random_state: int = 0,
     ) -> SVC:
+
     """Train an SVM with the given parameters.
 
     Parameters
@@ -81,13 +82,10 @@ def evaluate_kernels(
     Evaluate the kernels of the given SVMs. The evaluation is done by
     computing the accuracy score of each SVM on the test set.
     """
-    print("============================================")
     for kernel, svm in svms.items():
         if svm is None:
             continue
         y_pred = svm.predict(X_test)
         accuracy = round(accuracy_score(y_test, y_pred), 4)
-        print(
-            f"Accuracy Score of {kernel} kernel: {accuracy}",
-        )
-    print("============================================")
+        #print(f"Accuracy Score of {kernel} kernel: {accuracy}")
+        yield accuracy
