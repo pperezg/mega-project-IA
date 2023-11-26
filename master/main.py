@@ -63,60 +63,45 @@ if __name__ == "__main__":
 
     print('Terminó trabajo de Agustin')
 
+    ##################################################### Prepare to run all SVMs
+
+    ts = [0.1,0.5,0.6, 0.7, 0.8, 0.9, 1]
+    qs = [1, 1.2, 1.5, 1.7, 2, 2.5, 2.8]
+
+    space_ix=itertools.combinations(combinations, r=2)
+    kernel_ix=[('rbf',''),('lineal',''),('poli','')]+[('fisher','t{:.1f}_q{:.1f}'.format(t,q)) for t,q in itertools.product(ts,qs)]
+    svm_results=pd.DataFrame(columns=['accuracy'],
+                            index=pd.MultiIndex.from_tuples([tuple(itertools.chain(*row)) for row in itertools.product(space_ix,kernel_ix)],
+                                                            names=['(mu0,sigma0,q0)','(mu1,sigma1,q1)','SVM kernel','kernel parameters']))
+    
     ##################################################### Work by Pedro's team
 
-    svm_results=pd.DataFrame(columns=['rbf','linear','poli'],
-                             index=pd.MultiIndex.from_tuples(itertools.combinations(combinations, r=2),
-                                                             names=[0,1]))
+    for theta_0, theta_1 in tqdm(svm_results.index.droplevel(['SVM kernel','kernel parameters']).drop_duplicates()):
+        # Load data
+        df_ij=pd.read_csv(os.path.join(data_space_directory,'mu%s_sigma%s_q%s_mu%s_sigma%s_q%s.csv'%(*theta_0,*theta_1)))
+        x=df_ij[['mu','sigma']].to_numpy()
+        y=df_ij[['label']].to_numpy().squeeze()
 
-    for i in tqdm(range(len(combinations))):
-        for j in range(len(combinations)):
-            if i != j:
-                df_ij=pd.read_csv(os.path.join(data_space_directory,'mu%s_sigma%s_q%s_mu%s_sigma%s_q%s.csv'%(*combinations[i],*combinations[j])))
-                x, y = df_ij[['mu','sigma']].to_numpy(), df_ij[['label']].to_numpy().squeeze()
-                # Use an additional parameter called heat_kernel with your kerenl function
-                # or matrix.
-                svms = train_svms(x,y)
-                kernels_accuracy=evaluate_kernels(svms, x, y)
-                svm_results.loc[(combinations[i],combinations[j]),:]=list(kernels_accuracy)
+        # Train SVMs
+        svms = train_svms(x,y)
+        kernels_accuracy=evaluate_kernels(svms, x, y)
+        svm_results.loc[(theta_0,theta_1,['rbf','lineal','poli']),:]=list(kernels_accuracy)
 
-    svm_results.to_csv(os.path.join(data_directory,'svm_results.csv'))
+    svm_results.loc[(slice(None),slice(None),['rbf','lineal','poli']),:].to_csv(os.path.join(data_directory,'svm_results_a.csv'))
 
     print('Terminó trabajo de Pedro')
     
-############################ Main de Sofi y Abe
-'''
-def main(ts, qs, experiments, graph):
+############################ Work by Sofi & Abe's team
 
-    for name_exp in experiments:
-        path = f'data/{name_exp}'
-        X, labels = read_data(path)
+    for theta_0, theta_1 in svm_results.index.droplevel(['SVM kernel','kernel parameters']).drop_duplicates():
+        # Load data
+        df_ij=pd.read_csv(os.path.join(data_space_directory,'mu%s_sigma%s_q%s_mu%s_sigma%s_q%s.csv'%(*theta_0,*theta_1)))
+        x=df_ij[['mu','sigma']].to_numpy()
+        y=df_ij[['label']].to_numpy().squeeze()
 
-        create_folders_if_not_exist([f'results/{name_exp}'])
-        run_all_configurations(X, labels, ts, qs, name_exp, f'results/results_fisher_{name_exp}.csv', graph=graph)
+        f_acc=run_all_configurations_from_space(x, y, ts, qs)
+        svm_results.loc[(theta_0, theta_1,'fisher', 't'+f_acc['t'].astype(str)+'_q'+f_acc['q'].astype(str)),:]=f_acc['fisher'].to_numpy()
 
-if __name__ == "__main__":
+    svm_results.to_csv(os.path.join(data_directory,'svm_results_b.csv'))
 
-    if len(sys.argv) == 1:
-        print('Asumiendo argumentos por derecho')
-        experiments = ['exp1', 'exp2', 'exp3', 'exp4']
-        ts = [0.1,0.5,0.6, 0.7, 0.8, 0.9, 1]
-        qs = [1, 1.2, 1.5, 1.7, 2, 2.5, 2.8]
-        graph = False
-    elif len(sys.argv) == 5:
-        print('Leyendo argumentos')
-        experiments_str = sys.argv[1]
-        ts_str = sys.argv[2]
-        qs_str = sys.argv[3]
-        graph = sys.argv[4] == 'True'
-
-        experiments = experiments_str.split(',')
-        ts = [float(t) for t in ts_str.split(',')]
-        qs = [float(q) for q in qs_str.split(',')]
-        
-    else:
-        print('Error en los argumentos. Deben ser: [experiments] [ts] [qs] [graph]')
-        sys.exit()
-
-    main(ts, qs, experiments,graph)
-'''
+    print('Terminó trabajo de Sofi y Abe')
