@@ -7,6 +7,7 @@ import os
 import sys
 import itertools
 from tqdm import tqdm
+import pandas as pd
 
 if __name__ == "__main__":
     ##################################################### Work by Patiño's team
@@ -18,6 +19,8 @@ if __name__ == "__main__":
     verify_directory(points_directory)
     mu_sigma_directory = os.path.join(data_directory, "mu_sigma")
     verify_directory(mu_sigma_directory)
+    data_space_directory = os.path.join(data_directory, "data_space")
+    verify_directory(data_space_directory)
 
     mu = [0,5,10]
     sigma = [1,3,5]
@@ -61,22 +64,26 @@ if __name__ == "__main__":
     print('Terminó trabajo de Agustin')
 
     ##################################################### Work by Pedro's team
-'''
 
-def main():
-    # Random example
-    X = np.array([[1, 2], [3, 4]])
-    y = np.array([1, 2])
-    # Use an additional parameter called heat_kernel with your kerenl function
-    # or matrix.
-    svms = train_svms(X, y)
-    evaluate_kernels(svms, X, y)
+    svm_results=pd.DataFrame(columns=['rbf','linear','poli'],
+                             index=pd.MultiIndex.from_tuples(itertools.combinations(combinations, r=2),
+                                                             names=[0,1]))
 
+    for i in tqdm(range(len(combinations))):
+        for j in range(len(combinations)):
+            if i != j:
+                df_ij=pd.read_csv(os.path.join(data_space_directory,'mu%s_sigma%s_q%s_mu%s_sigma%s_q%s.csv'%(*combinations[i],*combinations[j])))
+                x, y = df_ij[['mu','sigma']].to_numpy(), df_ij[['label']].to_numpy().squeeze()
+                # Use an additional parameter called heat_kernel with your kerenl function
+                # or matrix.
+                svms = train_svms(x,y)
+                kernels_accuracy=evaluate_kernels(svms, x, y)
+                svm_results.loc[(combinations[i],combinations[j]),:]=list(kernels_accuracy)
 
-if __name__ == "__main__":
-    main()
-'''
+    svm_results.to_csv(os.path.join(data_directory,'svm_results.csv'))
 
+    print('Terminó trabajo de Pedro')
+    
 ############################ Main de Sofi y Abe
 '''
 def main(ts, qs, experiments, graph):
