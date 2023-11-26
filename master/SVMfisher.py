@@ -113,7 +113,7 @@ def plot_results(clf, X, y , kernel_name, params, exp):
     title = f"2-Class classification using Support Vector Machine with {kernel_name} kernel"
     
     if params is not None:
-        params_strs = ','.join([f'{name} = {params[name]}'for name in params])
+        params_strs = ','.join([f'{name}_{params[name]}'for name in params])
         path = f"results/{exp}/{kernel_name}_{params_strs}.png"
     else:
         path = f"results/{exp}/{kernel_name}.png"
@@ -134,8 +134,6 @@ def create_folders_if_not_exist(folder_paths):
     for folder_path in folder_paths:
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
-
-
 
 
 def sample_data(X, label, RANDOM_SEED, val = False):
@@ -204,7 +202,6 @@ def transform_space(X):
 
 def run_fisher_kernel(X_train, y_train, X_test, y_test, t, q, RANDOM_SEED):
 
-    
     instance = FisherKernel(t, q)
     svm_fisher = SVC(kernel=instance.kernelFisher, random_state = RANDOM_SEED)
     svm_fisher.fit(X_train, y_train)
@@ -264,6 +261,26 @@ def run_all_configurations(X, label, ts, qs, exp, path, graph ):
         
     df_results = pd.DataFrame(results, columns=['t', 'q', 'fisher', 'lineal', 'rbf'])
     df_results.to_csv(path, index=False)
+
+def run_all_configurations_from_space(X_T, label, ts, qs):
+
+    RANDOM_SEED = 42
+    np.random.seed(RANDOM_SEED)
+
+    X_T_train, X_T_test, y_train, y_test = sample_data(X_T, label, RANDOM_SEED, val = False)
+
+    best_acc_fisher = 0
+
+    results = []
+    for t in ts:
+        for q in qs:
+            params = dict(zip(['t', 'q'], [t, q]))
+            
+            accuracy_fisher, svm_fisher = run_fisher_kernel(X_T_train, y_train, X_T_test, y_test, t, q, RANDOM_SEED)
+            results.append([t, q, accuracy_fisher])
+    
+    return pd.DataFrame(results, columns=['t', 'q', 'fisher'])
+    #df_results.to_csv(path, index=False)
 
 
 def transform_data(data):
